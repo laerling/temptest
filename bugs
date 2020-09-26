@@ -1,3 +1,0 @@
-Spacemacs:
-- kill-buffer also proposes buffers that don't exist (i. e. last visited buffers), like ivy-switch-buffer.
-  Can this be reproduced in a clean Emacs distribution with only ivy installed?
