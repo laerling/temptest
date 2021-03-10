@@ -45,8 +45,10 @@ for num in range(0, rounds):
 
         # let the point tend to the three corners, according to RGB values
         pos2 = pos1
-        corners = ((0, 0), (width - 1, 0), (width // 2, height - 1))
+        corners = ((0, 0), (width - 1, 0), (0, height - 1), (width - 1, height - 1))
         pos2tendencies = []
+
+        # influence of the three color channels
         for x in range(3):
             influence = p1[x] / 255
             pos2tendencies.append((
@@ -54,10 +56,19 @@ for num in range(0, rounds):
                 pos2[1] - (influence * (pos2[1] - corners[x][1]))
                 ))
 
+        # influence of brightness
+        # Invert (1-) because we want the dark stuff to tend towards the
+        # corner. Else it'll just cancel itself out with the other attractors.
+        influence = 1 - ((p1[0] + p1[1] + p1[2]) / 3) / 255
+        pos2tendencies.append((
+            pos2[0] - (influence * (pos2[0] - corners[3][0])),
+            pos2[1] - (influence * (pos2[1] - corners[3][1]))
+            ))
+
         # move point to the average between the altered points
         pos2 = (
-                sum(map(lambda p: p[0], pos2tendencies)) // 3,
-                sum(map(lambda p: p[1], pos2tendencies)) // 3
+                sum(map(lambda p: p[0], pos2tendencies)) // 4,
+                sum(map(lambda p: p[1], pos2tendencies)) // 4
                 )
 
         # switch pixels
