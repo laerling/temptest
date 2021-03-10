@@ -3,49 +3,72 @@
 from PIL import Image
 from math import sqrt
 from random import random
+import shutil
+import subprocess
 import sys
+import tempfile
 
 
-# get filenames from arguments
-if len(sys.argv) <= 1:
+# get filename from arguments
+if len(sys.argv) <= 2:
     exit(1)
 
 ifilename = sys.argv[1]
-if len(sys.argv) <= 2:
-    ofilename = "./result.png"
-else:
-    ofilename = sys.argv[2]
+rounds = int(sys.argv[2])
 
-# load image
-print("Reading from {}".format(ifilename))
-i = Image.open(ifilename)
-width = i.size[0]
-height = i.size[1]
-px = i.load()
+# prepare initial image
+tempdir = tempfile.TemporaryDirectory()
+def number_to_filename(num):
+    return tempdir.name + "/{:05}.png".format(num)
+shutil.copyfile(ifilename, number_to_filename(0))
 
-# do something
-for _ in range(width * height):
+# start outer loop
+for num in range(0, rounds):
 
-    # choose random pixel
-    pos1 = (int(width * random()), int(height * random()))
-    p1 = px[pos1[0], pos1[1]]
+    # get filenames
+    ifilename = number_to_filename(num)
+    ofilename = number_to_filename(num + 1)
 
-    # let the point tend to the three corners, according to RGB values
-    pos2 = pos1
-    corners = ((0, 0), (width - 1, 0), (width // 2, height - 1))
-    for x in range(3):
-        influence = p1[x] / 255
-        pos2 = (pos2[0] - (influence * (pos2[0] - corners[x][0])),
-                pos2[1] - (influence * (pos2[1] - corners[x][1])))
+    # load image
+    print("Reading from {}".format(ifilename))
+    i = Image.open(ifilename)
+    width = i.size[0]
+    height = i.size[1]
+    px = i.load()
 
-    # normalize coordinates
-    pos2 = (int(pos2[0]), int(pos2[1]))
+    # do something
+    for _ in range(width * height):
 
-    # switch pixels
-    p2 = px[pos2[0], pos2[1]]
-    px[pos1[0], pos1[1]] = p2
-    px[pos2[0], pos2[1]] = p1
+        # choose random pixel
+        pos1 = (int(width * random()), int(height * random()))
+        p1 = px[pos1[0], pos1[1]]
 
-# save to output file
-print("Saving to {}".format(ofilename))
-i.save(ofilename)
+        # let the point tend to the three corners, according to RGB values
+        pos2 = pos1
+        corners = ((0, 0), (width - 1, 0), (width // 2, height - 1))
+        pos2tendencies = []
+        for x in range(3):
+            influence = p1[x] / 255
+            pos2tendencies.append((
+                pos2[0] - (influence * (pos2[0] - corners[x][0])),
+                pos2[1] - (influence * (pos2[1] - corners[x][1]))
+                ))
+
+        # move point to the average between the altered points
+        pos2 = (
+                sum(map(lambda p: p[0], pos2tendencies)) // 3,
+                sum(map(lambda p: p[1], pos2tendencies)) // 3
+                )
+
+        # switch pixels
+        p2 = px[pos2[0], pos2[1]]
+        px[pos1[0], pos1[1]] = p2
+        px[pos2[0], pos2[1]] = p1
+
+    # save to output file
+    print("Saving to {}".format(ofilename))
+    i.save(ofilename)
+
+# make gif
+print('Running: ffmpeg -y -i {}/%05d.png -vf fps=20 output.gif'.format(tempdir.name))
+subprocess.run(['ffmpeg', '-y', '-i', tempdir.name + '/%05d.png', '-vf', 'fps=20', 'output.gif'])
