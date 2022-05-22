@@ -1,12 +1,22 @@
-use mqtt::client::{Builder, Session};
+use tungstenite::{connect, Message};
+use url::Url;
 
 fn main() {
-    let client = Builder::default().client_id(client_id).build();
-    let session = Session::new(client);
+    let (mut socket, response) =
+	connect(Url::parse("ws://127.0.0.1:9001/socket").unwrap())
+	.expect("Can't connect");
 
-    let clean_session = false; // TODO: What does this mean?
-    let keep_alive = 60; // TODO: Seconds??
-    let auth = None;
-    let last_will = None;
-    session.connect(client_id, keep_alive, auth, last_will);
+    println!("Connected to the server");
+    println!("Response HTTP code: {}", response.status());
+    println!("Response contains the following headers:");
+    for (ref header, _value) in response.headers() {
+	println!("* {}", header);
+    }
+
+    socket.write_message(Message::Text("Hello WebSocket".into())).unwrap();
+    loop {
+	let msg = socket.read_message().expect("Error reading message");
+	println!("Received: {}", msg);
+    }
+    // socket.close(None);
 }

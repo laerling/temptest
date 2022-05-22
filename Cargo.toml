@@ -6,7 +6,8 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-mqtt = "0.1.4"
+tungstenite = "0.17.2"
+url = "*" # determined by tungstenite
 
 [[bin]]
 name = "client"
