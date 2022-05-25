@@ -1,18 +1,9 @@
 [package]
-name = "temptest"
+name = "timer_future"
 version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-tungstenite = "0.17.2"
-url = "*" # determined by tungstenite
-
-[[bin]]
-name = "client"
-path = "src/client.rs"
-
-[[bin]]
-name = "server"
-path = "src/server.rs"
+futures = "0.3"
