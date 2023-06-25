@@ -15,7 +15,6 @@ if len(sys.argv) <= 2:
 
 ifilename = sys.argv[1]
 rounds = int(sys.argv[2])
-travel_fraction = 0.1
 
 # prepare initial image
 tempdir = tempfile.TemporaryDirectory()
@@ -36,6 +35,12 @@ for num in range(0, rounds):
     width = i.size[0]
     height = i.size[1]
     px = i.load()
+
+    # change amount that the pixel travels
+    x = 10/rounds*num # result will go from ~0.066 to ~0.99
+    import math
+    travel_fraction = 1/(1+math.e**-(x-5)) # sigmoid. I. e. accelerate with time
+    print(travel_fraction)
 
     # do something
     for _ in range(width * height):
