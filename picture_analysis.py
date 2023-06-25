@@ -15,6 +15,7 @@ if len(sys.argv) <= 2:
 
 ifilename = sys.argv[1]
 rounds = int(sys.argv[2])
+travel_fraction = 0.1
 
 # prepare initial image
 tempdir = tempfile.TemporaryDirectory()
@@ -65,10 +66,16 @@ for num in range(0, rounds):
             pos2[1] - (influence * (pos2[1] - corners[3][1]))
             ))
 
-        # move point to the average between the altered points
+        # calculate average between the altered points
         pos2 = (
                 sum(map(lambda p: p[0], pos2tendencies)) // 4,
                 sum(map(lambda p: p[1], pos2tendencies)) // 4
+                )
+
+        # move pixel a certain fraction of the distance towards the average
+        pos2 = (
+                pos1[0] + round((pos2[0] - pos1[0]) * travel_fraction),
+                pos1[1] + round((pos2[1] - pos1[1]) * travel_fraction)
                 )
 
         # switch pixels
