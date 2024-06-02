@@ -2,6 +2,7 @@
 evolution
 temptest
 *~
+*.swp
 
 # rust
 /target/
