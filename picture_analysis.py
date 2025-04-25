@@ -11,6 +11,9 @@ import tempfile
 
 # get filename from arguments
 if len(sys.argv) <= 2:
+    print("Two args needed:")
+    print("- Input file name")
+    print("- Rounds")
     exit(1)
 
 ifilename = sys.argv[1]
