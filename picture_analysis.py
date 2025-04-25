@@ -21,6 +21,7 @@ rounds = int(sys.argv[2])
 
 # prepare initial image
 tempdir = tempfile.TemporaryDirectory()
+print(f"tempdir: {tempdir}")
 def number_to_filename(num):
     return tempdir.name + "/{:05}.png".format(num)
 shutil.copyfile(ifilename, number_to_filename(0))
