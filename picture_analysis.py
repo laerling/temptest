@@ -99,3 +99,7 @@ for num in range(0, rounds):
 # make gif
 print('Running: ffmpeg -y -i {}/%05d.png -vf fps=20 output.gif'.format(tempdir.name))
 subprocess.run(['ffmpeg', '-y', '-i', tempdir.name + '/%05d.png', '-vf', 'fps=20', 'output.gif'])
+
+# copy picture directory
+subprocess.run(['mkdir', '-p', './output_pictures/'])
+subprocess.run(['bash', '-c', f"cp -f '{tempdir.name}'/* ./output_pictures/"])
