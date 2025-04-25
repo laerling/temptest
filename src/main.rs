@@ -1,9 +1,12 @@
-//use std::thread::{JoinHandle, sleep, spawn};
-//use std::time::Duration;
+#![allow(unused_imports)]
+#![allow(dead_code)]
+
+use std::thread::{JoinHandle, sleep, spawn};
+use std::time::Duration;
 
 use scrypt::{scrypt, Params};
 
-const KEY_LEN: usize = 32;
+const KEY_LEN: usize = 10; // minimum is 10 (80 bit), maximum is 64 (256 bit)
 
 fn main() {
     /*
@@ -19,15 +22,19 @@ fn main() {
     println!("Result: {}", y);
     */
 
-    let mut password = [0; KEY_LEN];
-    let (log_n, r, p) = (16, 8, 16);
-    let scrypt_params = Params::new(log_n, r, p, KEY_LEN).expect("Cannot create scrypt parameters");
+    // test scrypt performance
+    let mut key = Vec::new();
+    key.resize(KEY_LEN, 0);
+    let (log_n, r, p) = (4, 8, 16);
+    let scrypt_params = Params::new(log_n, r, p, KEY_LEN)
+        .expect("Cannot create scrypt parameters");
     let salt = "salt";
     let master_password = "your mom";
-    let _ = scrypt(
+    scrypt(
         master_password.as_bytes(),
         salt.as_bytes(),
         &scrypt_params,
-        &mut password,
-    );
+        &mut key,
+    ).expect("scrypt failed");
+    println!("{:?}", key);
 }
